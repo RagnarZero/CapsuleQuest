@@ -160,14 +160,13 @@ public partial class NetworkManager : Node
 
 		AddChild(player);
 
-		player.GlobalPosition = new Vector3((peerId - 1) * 2.5f, 25.0f, 0.0f);
+		int spawnIndex = _players.Count;
+		player.GlobalPosition = new Vector3(spawnIndex * 2.5f, 25.0f, 0.0f);
 
 		_players[peerId] = player;
 
-		GD.Print($"Spawned player for peer {peerId} on local peer {Multiplayer.GetUniqueId()}");
+		GD.Print($"Spawned player for peer {peerId} on local peer {Multiplayer.GetUniqueId()} at {player.GlobalPosition}");
 
-		// This is the important part:
-		// only hide the menu once THIS machine's own player exists.
 		if (peerId == Multiplayer.GetUniqueId())
 		{
 			_titleScreen?.ShowConnected();
