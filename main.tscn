@@ -1,0 +1,72 @@
+[gd_scene format=3 uid="uid://dpvsok5xyiden"]
+
+[ext_resource type="Script" uid="uid://clgv4v0gipqra" path="res://TerrainGenerator.cs" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://cpy6gufr2he1j" path="res://NetworkManager.cs" id="2_0xm2m"]
+[ext_resource type="PackedScene" uid="uid://b1dtvkpt2kbtu" path="res://Player.tscn" id="3_h2yge"]
+[ext_resource type="Script" uid="uid://bb1cv8lnclbol" path="res://TitleScreen.cs" id="4_1bvp3"]
+
+[node name="TerrainRoot" type="Node3D" unique_id=866467426]
+script = ExtResource("1_ig7tw")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=447909863]
+transform = Transform3D(0.8660254, -0.35355338, 0.35355338, 0, 0.70710677, 0.70710677, -0.5, -0.6123724, 0.6123724, 0, 0, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=27293940]
+
+[node name="NetworkManager" type="Node" parent="." unique_id=454701705]
+script = ExtResource("2_0xm2m")
+PlayerScene = ExtResource("3_h2yge")
+
+[node name="TitleScreen" type="Control" parent="." unique_id=160445542]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("4_1bvp3")
+
+[node name="Panel" type="Panel" parent="TitleScreen" unique_id=477620580]
+custom_minimum_size = Vector2(400, 260)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -130.0
+offset_right = 200.0
+offset_bottom = 130.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TitleScreen/Panel" unique_id=2038520250]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="TitleScreen/Panel/VBoxContainer" unique_id=1600585978]
+layout_mode = 2
+text = "Capsule Quest"
+
+[node name="IpLineEdit" type="LineEdit" parent="TitleScreen/Panel/VBoxContainer" unique_id=348068761]
+layout_mode = 2
+text = "127.0.0.1"
+placeholder_text = "Enter Host IP"
+
+[node name="HostButton" type="Button" parent="TitleScreen/Panel/VBoxContainer" unique_id=978239387]
+layout_mode = 2
+text = "Host Game"
+
+[node name="JoinButton" type="Button" parent="TitleScreen/Panel/VBoxContainer" unique_id=956045993]
+layout_mode = 2
+text = "Join Game"
+
+[node name="StatusLabel" type="Label" parent="TitleScreen/Panel/VBoxContainer" unique_id=905804015]
+layout_mode = 2
+text = "Enter IP, then host or join."
