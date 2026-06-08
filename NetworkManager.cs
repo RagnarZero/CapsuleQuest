@@ -1,3 +1,4 @@
+using Gemu;
 using Godot;
 using System.Collections.Generic;
 
@@ -8,8 +9,12 @@ public partial class NetworkManager : Node
 	[Export] public int MaxPlayers = 16;
 
 	private readonly Dictionary<int, CharacterBody3D> _players = new();
+	private readonly Dictionary<int, PlayerInfo> _playerInfos = new();
 
 	private TitleScreen _titleScreen;
+
+	private string _localPlayerName = "Player";
+	private Color _localPlayerColor = Colors.White;
 
 	public override void _Ready()
 	{
@@ -26,8 +31,11 @@ public partial class NetworkManager : Node
 		GD.Print("NetworkManager ready.");
 	}
 
-	public bool HostGame()
+	public bool HostGame(string playerName, Color playerColor)
 	{
+		_localPlayerName = playerName;
+		_localPlayerColor = playerColor;
+
 		var peer = new ENetMultiplayerPeer();
 		Error error = peer.CreateServer(Port, MaxPlayers);
 
@@ -43,13 +51,21 @@ public partial class NetworkManager : Node
 
 		GD.Print($"Hosting game. My peer id is {myId}");
 
+		_playerInfos[myId] = new PlayerInfo(playerName, playerColor);
+
 		SpawnPlayer(myId);
+		ApplyPlayerInfo(myId, playerName, playerColor);
+
+		_titleScreen?.ShowConnected();
 
 		return true;
 	}
 
-	public bool JoinGame(string address)
+	public bool JoinGame(string address, string playerName, Color playerColor)
 	{
+		_localPlayerName = playerName;
+		_localPlayerColor = playerColor;
+
 		var peer = new ENetMultiplayerPeer();
 		Error error = peer.CreateClient(address, Port);
 
@@ -68,10 +84,16 @@ public partial class NetworkManager : Node
 
 	private void OnConnectedToServer()
 	{
-		GD.Print($"Connected to server. My peer id is {Multiplayer.GetUniqueId()}");
+		int myId = Multiplayer.GetUniqueId();
 
-		// Do NOT hide the title screen here.
-		// We only hide it once the local player's camera actually exists.
+		GD.Print($"Connected to server. My peer id is {myId}");
+
+		RpcId(
+			1,
+			nameof(RegisterPlayerInfoOnServer),
+			_localPlayerName,
+			_localPlayerColor
+		);
 	}
 
 	private void OnConnectionFailed()
@@ -97,13 +119,25 @@ public partial class NetworkManager : Node
 
 		int newPeerId = (int)peerId;
 
-		// Tell the newly connected client about all players that already exist.
+		// Send existing players to the new client.
 		foreach (int existingPeerId in _players.Keys)
 		{
 			RpcId(newPeerId, nameof(SpawnPlayerOnAllPeers), existingPeerId);
 		}
 
-		// Tell everyone about the newly connected player.
+		// Send existing player info to the new client.
+		foreach (var pair in _playerInfos)
+		{
+			RpcId(
+				newPeerId,
+				nameof(ApplyPlayerInfoOnAllPeers),
+				pair.Key,
+				pair.Value.Name,
+				pair.Value.Color
+			);
+		}
+
+		// Spawn the new player for everyone.
 		Rpc(nameof(SpawnPlayerOnAllPeers), newPeerId);
 	}
 
@@ -116,7 +150,33 @@ public partial class NetworkManager : Node
 			return;
 		}
 
-		Rpc(nameof(RemovePlayerOnAllPeers), (int)peerId);
+		int disconnectedPeerId = (int)peerId;
+
+		_playerInfos.Remove(disconnectedPeerId);
+
+		Rpc(nameof(RemovePlayerOnAllPeers), disconnectedPeerId);
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+	public void RegisterPlayerInfoOnServer(string playerName, Color playerColor)
+	{
+		if (!Multiplayer.IsServer())
+		{
+			return;
+		}
+
+		int senderId = Multiplayer.GetRemoteSenderId();
+
+		GD.Print($"Received player info from {senderId}: {playerName}");
+
+		_playerInfos[senderId] = new PlayerInfo(playerName, playerColor);
+
+		Rpc(
+			nameof(ApplyPlayerInfoOnAllPeers),
+			senderId,
+			playerName,
+			playerColor
+		);
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true)]
@@ -138,6 +198,12 @@ public partial class NetworkManager : Node
 		_players.Remove(peerId);
 	}
 
+	[Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true)]
+	public void ApplyPlayerInfoOnAllPeers(int peerId, string playerName, Color playerColor)
+	{
+		ApplyPlayerInfo(peerId, playerName, playerColor);
+	}
+
 	private void SpawnPlayer(int peerId)
 	{
 		if (_players.ContainsKey(peerId))
@@ -154,8 +220,6 @@ public partial class NetworkManager : Node
 		var player = PlayerScene.Instantiate<CharacterBody3D>();
 
 		player.Name = $"Player_{peerId}";
-
-		// Important: set authority BEFORE AddChild, so _Ready() sees the correct authority.
 		player.SetMultiplayerAuthority(peerId);
 
 		AddChild(player);
@@ -167,10 +231,30 @@ public partial class NetworkManager : Node
 
 		GD.Print($"Spawned player for peer {peerId} on local peer {Multiplayer.GetUniqueId()} at {player.GlobalPosition}");
 
+		if (_playerInfos.TryGetValue(peerId, out PlayerInfo info))
+		{
+			ApplyPlayerInfo(peerId, info.Name, info.Color);
+		}
+
 		if (peerId == Multiplayer.GetUniqueId())
 		{
 			_titleScreen?.ShowConnected();
 			Input.MouseMode = Input.MouseModeEnum.Captured;
+		}
+	}
+
+	private void ApplyPlayerInfo(int peerId, string playerName, Color playerColor)
+	{
+		if (!_players.TryGetValue(peerId, out CharacterBody3D player))
+		{
+			GD.Print($"Player {peerId} not spawned yet. Cannot apply info.");
+			return;
+		}
+
+		if (player is PlayerController playerController)
+		{
+			playerController.SetDisplayName(playerName);
+			playerController.SetColor(playerColor);
 		}
 	}
 }

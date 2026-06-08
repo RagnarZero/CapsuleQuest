@@ -12,17 +12,25 @@ public partial class PlayerController : CharacterBody3D
 
 	private Node3D _cameraPivot;
 	private Camera3D _camera;
+	private MeshInstance3D _mesh;
+	private Label3D _playerNameField;
 	private float _pitchDegrees = 0.0f;
 
 	public override void _Ready()
 	{
 		_cameraPivot = GetNode<Node3D>("CameraPivot");
 		_camera = GetNode<Camera3D>("CameraPivot/Camera3D");
+		_mesh = GetNode<MeshInstance3D>("PlayerMesh");
+		_playerNameField = GetNode<Label3D>("NameDisplay");
+
+		var material = new StandardMaterial3D();
+		material.AlbedoColor = new Color(0.1f, 0.4f, 1.0f); // blue
+
+		_mesh.MaterialOverride = material;
 
 		bool isMine = IsMultiplayerAuthority();
 
 		GD.Print($"{Name} ready. Local peer: {Multiplayer.GetUniqueId()}, authority: {GetMultiplayerAuthority()}, isMine: {isMine}");
-
 		_camera.Current = isMine;
 	}
 
@@ -47,6 +55,23 @@ public partial class PlayerController : CharacterBody3D
 		{
 			Input.MouseMode = Input.MouseModeEnum.Captured;
 		}
+	}
+
+	public void SetColor(Color color)
+	{
+		var material = new StandardMaterial3D
+		{
+			AlbedoColor = color,
+			Roughness = 1.0f
+		};
+
+		_mesh.MaterialOverride = material;
+	}
+
+	public void SetDisplayName(string playerName)
+	{
+		GD.Print($"Set display name to {playerName}");
+		_playerNameField.Text = playerName;
 	}
 
 	public override void _PhysicsProcess(double delta)

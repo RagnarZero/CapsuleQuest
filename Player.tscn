@@ -8,17 +8,25 @@ height = 1.8
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_ig7tw"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xhfnw"]
+albedo_color = Color(1, 0.93333334, 1, 1)
+
 [node name="Player" type="CharacterBody3D" unique_id=2006132287]
 script = ExtResource("1_xhfnw")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1080212603]
 shape = SubResource("CapsuleShape3D_ig7tw")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1054807222]
+[node name="PlayerMesh" type="MeshInstance3D" parent="." unique_id=1054807222]
 mesh = SubResource("CapsuleMesh_ig7tw")
+surface_material_override/0 = SubResource("StandardMaterial3D_xhfnw")
 
 [node name="CameraPivot" type="Node3D" parent="." unique_id=984633984]
 
 [node name="Camera3D" type="Camera3D" parent="CameraPivot" unique_id=474300980]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5271931, 3.8155565)
 current = true
+
+[node name="NameDisplay" type="Label3D" parent="." unique_id=1111929846]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3667357, 0)
+text = "Player"

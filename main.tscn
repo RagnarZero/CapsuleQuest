@@ -5,6 +5,9 @@
 [ext_resource type="PackedScene" uid="uid://b1dtvkpt2kbtu" path="res://Player.tscn" id="3_h2yge"]
 [ext_resource type="Script" uid="uid://bb1cv8lnclbol" path="res://TitleScreen.cs" id="4_1bvp3"]
 
+[sub_resource type="LabelSettings" id="LabelSettings_1bvp3"]
+font_size = 24
+
 [node name="TerrainRoot" type="Node3D" unique_id=866467426]
 script = ExtResource("1_ig7tw")
 
@@ -27,7 +30,7 @@ grow_vertical = 2
 script = ExtResource("4_1bvp3")
 
 [node name="Panel" type="Panel" parent="TitleScreen" unique_id=477620580]
-custom_minimum_size = Vector2(400, 260)
+custom_minimum_size = Vector2(400, 300)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -53,6 +56,17 @@ theme_override_constants/separation = 12
 [node name="TitleLabel" type="Label" parent="TitleScreen/Panel/VBoxContainer" unique_id=1600585978]
 layout_mode = 2
 text = "Capsule Quest"
+label_settings = SubResource("LabelSettings_1bvp3")
+horizontal_alignment = 1
+
+[node name="NameLineEdit" type="LineEdit" parent="TitleScreen/Panel/VBoxContainer" unique_id=1098203697]
+layout_mode = 2
+text = "Name"
+
+[node name="PlayerColor" type="ColorPickerButton" parent="TitleScreen/Panel/VBoxContainer" unique_id=1406760457]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+color = Color(0.6344118, 0.08889959, 0.33239776, 1)
 
 [node name="IpLineEdit" type="LineEdit" parent="TitleScreen/Panel/VBoxContainer" unique_id=348068761]
 layout_mode = 2
