@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://b1dtvkpt2kbtu"]
 
 [ext_resource type="Script" uid="uid://dtwd1xcyq34mc" path="res://PlayerController.cs" id="1_xhfnw"]
+[ext_resource type="Shader" path="res://overlay.gdshader" id="2_kpjcp"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ig7tw"]
 radius = 0.4
@@ -10,6 +11,16 @@ height = 1.8
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xhfnw"]
 albedo_color = Color(1, 0.93333334, 1, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_kne1u"]
+render_priority = 0
+shader = ExtResource("2_kpjcp")
+shader_parameter/pixel_size = 10.0
+
+[sub_resource type="QuadMesh" id="QuadMesh_e80uo"]
+material = SubResource("ShaderMaterial_kne1u")
+flip_faces = true
+size = Vector2(2, 2)
 
 [node name="Player" type="CharacterBody3D" unique_id=2006132287]
 script = ExtResource("1_xhfnw")
@@ -26,6 +37,11 @@ surface_material_override/0 = SubResource("StandardMaterial3D_xhfnw")
 [node name="Camera3D" type="Camera3D" parent="CameraPivot" unique_id=474300980]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5271931, 3.8155565)
 current = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CameraPivot/Camera3D" unique_id=252799509]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.4670267)
+extra_cull_margin = 16384.0
+mesh = SubResource("QuadMesh_e80uo")
 
 [node name="NameDisplay" type="Label3D" parent="." unique_id=1111929846]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3667357, 0)
