@@ -21,7 +21,7 @@ public partial class PlayerController : CharacterBody3D
 		_cameraPivot = GetNode<Node3D>("CameraPivot");
 		_camera = GetNode<Camera3D>("CameraPivot/Camera3D");
 		_mesh = GetNode<MeshInstance3D>("PlayerMesh");
-		_playerNameField = GetNode<Label3D>("NameDisplay");
+		_playerNameField = GetNode<Label3D>("PlayerMesh/NameDisplay");
 
 		var material = new StandardMaterial3D();
 		material.AlbedoColor = new Color(0.1f, 0.4f, 1.0f); // blue

@@ -11,12 +11,12 @@ POSITION = vec4(VERTEX.xy, 1.0, 1.0);
 
 void fragment() {
 	vec2 tex_size = vec2(textureSize(screen_texture, 0));
-	vec2 pixel_count = tex_size / pixel_size;
+	vec2 pixel_count = tex_size / (pixel_size * 2.) ;
 	vec2 pixelated_uv = floor(SCREEN_UV * pixel_count) / pixel_count;
 	vec4 color = texture(screen_texture, pixelated_uv);
 
 	ALBEDO = color.rgb;
-	ALPHA = color.a;
+	ALPHA = 1.0f;
 
 }
 

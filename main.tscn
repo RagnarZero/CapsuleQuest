@@ -4,15 +4,33 @@
 [ext_resource type="Script" uid="uid://cpy6gufr2he1j" path="res://NetworkManager.cs" id="2_0xm2m"]
 [ext_resource type="PackedScene" uid="uid://b1dtvkpt2kbtu" path="res://Player.tscn" id="3_h2yge"]
 [ext_resource type="Script" uid="uid://bb1cv8lnclbol" path="res://TitleScreen.cs" id="4_1bvp3"]
+[ext_resource type="Shader" uid="uid://dsm4en14ed34g" path="res://sky.tres" id="5_lquwl"]
+[ext_resource type="Texture2D" uid="uid://bh7qmhw0x65rp" path="res://sky.png" id="6_7mycd"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_1bvp3"]
 font_size = 24
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7mycd"]
+shader = ExtResource("5_lquwl")
+shader_parameter/tex = ExtResource("6_7mycd")
+
+[sub_resource type="Sky" id="Sky_1bvp3"]
+sky_material = SubResource("ShaderMaterial_7mycd")
+
+[sub_resource type="Environment" id="Environment_lquwl"]
+background_mode = 1
+background_color = Color(0.57409465, 0.71350867, 1, 1)
+sky = SubResource("Sky_1bvp3")
+ambient_light_source = 1
+ambient_light_energy = 0.0
+reflected_light_source = 1
 
 [node name="TerrainRoot" type="Node3D" unique_id=866467426]
 script = ExtResource("1_ig7tw")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=447909863]
 transform = Transform3D(0.8660254, -0.35355338, 0.35355338, 0, 0.70710677, 0.70710677, -0.5, -0.6123724, 0.6123724, 0, 0, 0)
+shadow_enabled = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=27293940]
 
@@ -84,3 +102,6 @@ text = "Join Game"
 [node name="StatusLabel" type="Label" parent="TitleScreen/Panel/VBoxContainer" unique_id=905804015]
 layout_mode = 2
 text = "Enter IP, then host or join."
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=529631410]
+environment = SubResource("Environment_lquwl")
